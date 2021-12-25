@@ -1,3 +1,5 @@
+import { Post } from "../interfaces";
+
 async function fetchComments(postId: number) {
   const response = await fetch(
     `https://jsonplaceholder.typicode.com/comments?postId=${postId}`
@@ -21,7 +23,10 @@ async function updatePost(postId: number) {
   return response.json();
 }
 
-export function PostDetail({ post } : any) {
+interface Props {
+  post: Post
+}
+export function PostDetail({ post } : Props) {
   // replace with useQuery
   const data:any = [];
 
