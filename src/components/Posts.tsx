@@ -7,7 +7,7 @@ const maxPostPage = 10;
 
 async function fetchPosts() {
   const response = await fetch(
-    "https://jsosnplaceholder.typicode.com/posts?_limit=10&_page=0"
+    "https://jsonplaceholder.typicode.com/posts?_limit=10&_page=0"
   );
   return response.json();
 }
@@ -16,7 +16,9 @@ export function Posts() {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [selectedPost, setSelectedPost] = useState<Post>();
 
-  const {data, isError, isLoading, error, /* isFetching */}= useQuery<Post[]>('posts', fetchPosts)
+  const {data, isError, isLoading, error, /* isFetching */}= useQuery<Post[]>('posts', fetchPosts, {
+    //staleTime: 2000,
+  })
   //the diference between isLoading and isFetching,  is that isFetching is the async query that hasn't been solved yet
   //isLoading is the same, but with the plus that there is no cached data 
   //by default react query tries to run te request 3 times if there is any error
