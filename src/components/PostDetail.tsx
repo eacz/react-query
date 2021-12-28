@@ -29,8 +29,8 @@ interface Props {
   post: Post
 }
 export function PostDetail({ post } : Props) {
-  // replace with useQuery
-  const { data, isLoading, isError } = useQuery<Comment[]>('comments', () => fetchComments(post.id));
+  //the first argument of useQuery can be an array of dependencies, if these dependencies changes, there'll be a refetch
+  const { data, isLoading, isError } = useQuery<Comment[]>(['comments', post.id], () => fetchComments(post.id));
 
   return (
     <>
