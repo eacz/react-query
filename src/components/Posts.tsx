@@ -5,20 +5,25 @@ import { Post } from "../interfaces";
 import { PostDetail } from "./PostDetail";
 const maxPostPage = 10;
 
-async function fetchPosts() {
+async function fetchPosts(page: number) {
   const response = await fetch(
-    "https://jsonplaceholder.typicode.com/posts?_limit=10&_page=0"
+    `https://jsonplaceholder.typicode.com/posts?_limit=10&_page=${page}`
   );
   return response.json();
 }
 
 export function Posts() {
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedPost, setSelectedPost] = useState<Post>();
 
-  const {data, isError, isLoading, error, /* isFetching */}= useQuery<Post[]>('posts', fetchPosts, {
-    //staleTime: 2000,
-  })
+  const handleCurrentPageChange = (n: number) => {
+    setCurrentPage(s => Math.max(1, s+n))
+  }
+
+  const {data, isError, isLoading, /* isFetching */}= useQuery<Post[]>(
+    ['posts', currentPage], 
+    () => fetchPosts(currentPage), 
+    {  staleTime: 2000, keepPreviousData: true })
   //the diference between isLoading and isFetching,  is that isFetching is the async query that hasn't been solved yet
   //isLoading is the same, but with the plus that there is no cached data 
   //by default react query tries to run te request 3 times if there is any error
@@ -30,8 +35,7 @@ export function Posts() {
       <ul>
         {data!.map((post) => (
           <li
-            key={post.id}
-            className="post-title"
+            key={post.id} className="post-title"
             onClick={() => setSelectedPost(post)}
           >
             {post.title}
@@ -39,12 +43,18 @@ export function Posts() {
         ))}
       </ul>
       <div className="pages">
-        <button disabled onClick={() => {}}>
-          Previous page
+        <button 
+          onClick={() => handleCurrentPageChange(-1)} 
+          disabled={currentPage === 1} 
+        > 
+          Previous page 
         </button>
         <span>Page {currentPage + 1}</span>
-        <button disabled onClick={() => {}}>
-          Next page
+        <button 
+          onClick={() => handleCurrentPageChange(1)}
+          disabled={currentPage >= maxPostPage}
+        > 
+          Next page 
         </button>
       </div>
       <hr />
