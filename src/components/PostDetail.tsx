@@ -1,6 +1,6 @@
 import { Post } from "../interfaces";
 import { Comment } from '../interfaces/index';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
 async function fetchComments(postId: number) {
   const response = await fetch(
@@ -31,16 +31,25 @@ interface Props {
 export function PostDetail({ post } : Props) {
   //the first argument of useQuery can be an array of dependencies, if these dependencies changes, there'll be a refetch
   const { data, isLoading, isError } = useQuery<Comment[]>(['comments', post.id], () => fetchComments(post.id));
-
+  const deleteMutation = useMutation((PostId: number) =>  deletePost(PostId) )
   return (
     <>
-
       <h3 style={{ color: "blue" }}>{post.title}</h3>
-      <button>Delete</button> <button>Update title</button>
+      
+      <button onClick={() => deleteMutation.mutate(post.id)} >Delete</button> 
+      <button>Update title</button>
+
+      {deleteMutation.error && <p style={{color: 'red'}}> Error deleting the post</p> }
+      {deleteMutation.isLoading && <p style={{color: 'purple'}}> deleting the post...</p> }
+      {deleteMutation.isSuccess && <p style={{color: 'green'}}> successfully deleted the post...</p> }
+      
       <p>{post.body}</p>
       <h4>Comments</h4>
+      
       {isLoading && <h3 style={{color: 'aquamarine'}}>Loading comments...</h3>}
+      
       {isError && <h3 style={{color: 'red'}} >Error loading comments, please refresh</h3>}
+      
       {data?.map((comment) => (
         <li key={comment.id}>
           {comment.email}: {comment.body}
